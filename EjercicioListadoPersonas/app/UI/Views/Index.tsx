@@ -1,6 +1,15 @@
 import { observer } from "mobx-react-lite";
 import React, { useRef } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View, Animated } from "react-native";
+import { 
+  FlatList, 
+  Pressable, 
+  StyleSheet, 
+  Text, 
+  View, 
+  Animated, 
+  ActivityIndicator,
+  RefreshControl 
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonasListaVM } from "../ViewModels/PersonasListaVM";
 import { container } from "@/app/Core/container";
@@ -73,6 +82,51 @@ const PeopleList = observer(() => {
     );
   };
 
+  // Componente de Loading
+  if (viewModel.isLoading && viewModel.personasList.length === 0) {
+    return (
+      <LinearGradient
+        colors={['#667eea', '#764ba2', '#f093fb']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientBackground}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#FFFFFF" />
+            <Text style={styles.loadingText}>Cargando personas...</Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Componente de Error
+  if (viewModel.error) {
+    return (
+      <LinearGradient
+        colors={['#667eea', '#764ba2', '#f093fb']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientBackground}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.errorTitle}>Error al cargar</Text>
+            <Text style={styles.errorText}>{viewModel.error}</Text>
+            <Pressable 
+              style={styles.retryButton}
+              onPress={() => viewModel.recargarPersonas()}
+            >
+              <Text style={styles.retryButtonText}>Reintentar</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#667eea', '#764ba2', '#f093fb']}
@@ -83,7 +137,7 @@ const PeopleList = observer(() => {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.titulo}>✨ Personas</Text>
-          {viewModel.personaSeleccionada && (
+          {viewModel.personaSeleccionada && viewModel.personaSeleccionada.id !== 0 && (
             <View style={styles.selectedBanner}>
               <Text style={styles.selectedLabel}>Seleccionado:</Text>
               <Text style={styles.selectedName}>
@@ -108,6 +162,14 @@ const PeopleList = observer(() => {
             )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={viewModel.isLoading}
+                onRefresh={() => viewModel.recargarPersonas()}
+                tintColor="#FFFFFF"
+                colors={["#667eea"]}
+              />
+            }
           />
         </View>
       </SafeAreaView>
@@ -269,6 +331,57 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
+  },
+  // Estilos de Loading
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  // Estilos de Error
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+  },
+  errorIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.9)",
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#667eea",
   },
 });
 
