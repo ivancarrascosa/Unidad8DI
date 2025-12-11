@@ -13,7 +13,7 @@ export class PersonasUseCase implements IPersonasUseCase {
         private RepositoryPersonas: IRepositoryPersonas
     ) {}
 
-    getListaPersonas(): Persona[] {
+    getListaPersonas(): Promise<Persona[]> {
         return this.RepositoryPersonas.getListadoCompletoPersonas();
     }
 }

@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export class PersonasRepository implements IRepositoryPersonas{
-    getListadoCompletoPersonas(): Persona[] {
+    async getListadoCompletoPersonas(): Promise<Persona[]> {
         return [
   new Persona(1, "Juan", "Pérez", new Date("1990-01-15"), "Calle 1", "555-1001", "img1.jpg", 1),
   new Persona(2, "María", "Gómez", new Date("1988-03-22"), "Calle 2", "555-1002", "img2.jpg", 2),

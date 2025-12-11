@@ -4,7 +4,7 @@ import { IPersonasUseCase } from "@/app/Domain/Interfaces/IPersonasUseCase";
 import { inject } from "inversify";
 import {  makeAutoObservable } from "mobx";
 export class PersonasListaVM {
-    private _personasList: Persona[] = [];
+    private _personasList: Promise<Persona[]> = Promise.resolve([]);
     private _personaSeleccionada: Persona;
 
     constructor(
@@ -16,7 +16,7 @@ export class PersonasListaVM {
         makeAutoObservable(this);
     }
 
-    public get personasList(): Persona[] {
+    public get personasList(): Promise<Persona[]> {
         return this._personasList;
     }
 
