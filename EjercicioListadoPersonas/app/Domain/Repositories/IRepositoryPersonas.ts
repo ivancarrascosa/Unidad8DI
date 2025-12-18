@@ -1,5 +1,5 @@
 import { Persona } from "../Entities/Persona";
 
 export interface IRepositoryPersonas {
-    getListadoCompletoPersonas(): Persona[];
+    getListadoCompletoPersonas(): Promise<Persona[]>;
 }
