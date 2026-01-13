@@ -1,11 +1,14 @@
+import { injectable, inject } from 'inversify';
 import { Departamento } from '../entities/Departamento';
 import { IDepartamentoUseCase } from '../interfaces/IDepartamentoUseCase';
 import { IDepartamentoRepository } from '../repositories/IDepartamentoRepository';
+import { TYPES } from '../../DI/types';
 
+@injectable()
 export class DefaultDepartamentosUseCase implements IDepartamentoUseCase {
   private repository: IDepartamentoRepository;
 
-  constructor(repository: IDepartamentoRepository) {
+  constructor(@inject(TYPES.IRepositoryDepartamentos) repository: IDepartamentoRepository) {
     this.repository = repository;
   }
 

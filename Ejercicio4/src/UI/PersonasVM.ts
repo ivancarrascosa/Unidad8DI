@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
 import { Persona } from '../Domain/entities/Persona';
 import { Departamento } from '../Domain/entities/Departamento';
-import { DefaultPersonasUseCase } from '../Domain/useCases/DefaultPersonasUseCase';
-import { DefaultDepartamentosUseCase } from '../Domain/useCases/DefaultDepartamentosUseCase';
-import { PersonaRepository } from '../data/repositories/PersonaRepository';
-import { DepartamentoRepository } from '../data/repositories/DepartamentoRepository';
+import { IPersonaUseCase } from '../Domain/interfaces/IPersonaUseCase';
+import { IDepartamentoUseCase } from '../Domain/interfaces/IDepartamentoUseCase';
+import { container } from '../DI/container';
+import { TYPES } from '../DI/types';
 
 // Singleton state holder
 class PersonasState {
@@ -44,10 +44,8 @@ export interface PersonasVMActions {
 }
 
 export const usePersonasVM = (): PersonasVMState & PersonasVMActions => {
-  const personaRepository = PersonaRepository.getInstance();
-  const departamentoRepository = DepartamentoRepository.getInstance();
-  const personaUseCase = new DefaultPersonasUseCase(personaRepository);
-  const departamentoUseCase = new DefaultDepartamentosUseCase(departamentoRepository);
+  const personaUseCase = container.get<IPersonaUseCase>(TYPES.IUseCasePersonas);
+  const departamentoUseCase = container.get<IDepartamentoUseCase>(TYPES.IUseCaseDepartamentos);
 
   const [state, setState] = useState<PersonasVMState>({
     listaPersonas: PersonasState.getInstance().listaPersonas,

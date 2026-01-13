@@ -1,11 +1,14 @@
+import { injectable, inject } from 'inversify';
 import { Persona } from '../entities/Persona';
 import { IPersonaUseCase } from '../interfaces/IPersonaUseCase';
 import { IPersonaRepository } from '../repositories/IPersonaRepository';
+import { TYPES } from '../../DI/types';
 
+@injectable()
 export class DefaultPersonasUseCase implements IPersonaUseCase {
   private repository: IPersonaRepository;
 
-  constructor(repository: IPersonaRepository) {
+  constructor(@inject(TYPES.IRepositoryPersonas) repository: IPersonaRepository) {
     this.repository = repository;
   }
 

@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { Departamento } from '../Domain/entities/Departamento';
-import { DefaultDepartamentosUseCase } from '../Domain/useCases/DefaultDepartamentosUseCase';
-import { DepartamentoRepository } from '../data/repositories/DepartamentoRepository';
+import { IDepartamentoUseCase } from '../Domain/interfaces/IDepartamentoUseCase';
+import { container } from '../DI/container';
+import { TYPES } from '../DI/types';
 
 // Singleton state holder
 class DepartamentosState {
@@ -38,8 +39,7 @@ export interface DepartamentosVMActions {
 }
 
 export const useDepartamentosVM = (): DepartamentosVMState & DepartamentosVMActions => {
-  const repository = DepartamentoRepository.getInstance();
-  const useCase = new DefaultDepartamentosUseCase(repository);
+  const useCase = container.get<IDepartamentoUseCase>(TYPES.IUseCaseDepartamentos);
 
   const [state, setState] = useState<DepartamentosVMState>({
     listaDepartamentos: DepartamentosState.getInstance().listaDepartamentos,

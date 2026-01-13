@@ -12,26 +12,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from './navigation';
-import { usePersonasVM } from '../UI/PersonasVM';
-import { Persona } from '../Domain/entities/Persona';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { usePersonasVM } from '../src/UI/PersonasVM';
+import { Persona } from '../src/Domain/entities/Persona';
 import { Picker } from '@react-native-picker/picker';
 
-type EditarCrearPersonaNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'EditarCrearPersona'
->;
-type EditarCrearPersonaRouteProp = RouteProp<RootStackParamList, 'EditarCrearPersona'>;
-
-interface Props {
-  navigation: EditarCrearPersonaNavigationProp;
-  route: EditarCrearPersonaRouteProp;
-}
-
-export const EditarCrearPersonaScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { personaId } = route.params || {};
+export default function EditarCrearPersonaScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const personaId = params.personaId ? Number(params.personaId) : undefined;
   const isEditing = personaId !== undefined;
 
   const {
@@ -121,7 +110,7 @@ export const EditarCrearPersonaScreen: React.FC<Props> = ({ navigation, route })
       Alert.alert(
         'Éxito',
         isEditing ? 'Persona actualizada correctamente' : 'Persona creada correctamente',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => router.back() }]
       );
     }
   };
@@ -230,7 +219,7 @@ export const EditarCrearPersonaScreen: React.FC<Props> = ({ navigation, route })
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => navigation.goBack()}
+                onPress={() => router.back()}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>

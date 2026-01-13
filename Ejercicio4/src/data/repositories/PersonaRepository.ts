@@ -1,18 +1,11 @@
+import { injectable } from 'inversify';
 import { Persona } from '../../Domain/entities/Persona';
 import { IPersonaRepository } from '../../Domain/repositories/IPersonaRepository';
 import { API_URL, ENDPOINTS } from '../services/APIConnection';
 
+@injectable()
 export class PersonaRepository implements IPersonaRepository {
-  private static instance: PersonaRepository;
-
-  private constructor() {}
-
-  public static getInstance(): PersonaRepository {
-    if (!PersonaRepository.instance) {
-      PersonaRepository.instance = new PersonaRepository();
-    }
-    return PersonaRepository.instance;
-  }
+  constructor() {}
 
   async crearPersona(persona: Persona): Promise<Persona> {
     try {

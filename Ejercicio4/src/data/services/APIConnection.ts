@@ -1,10 +1,6 @@
 // TODO: Configura tu BASE_URL aquí
 export const API_URL = 'https://ui20251201140330-ahdqhwe3c6cxcrfk.italynorth-01.azurewebsites.net/api/';
 
-// ============================================================
-// ENDPOINTS - Basados en DepartamentoApiController y PersonasApiController
-// ============================================================
-
 export const ENDPOINTS = {
   // Personas - PersonasApiController
   PERSONAS: {

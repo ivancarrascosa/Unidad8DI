@@ -7,21 +7,15 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './_layout';
+import { useRouter } from 'expo-router';
 
+export default function IndexScreen() {
+  const router = useRouter();
 
-type IndexScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Index'>;
-
-interface Props {
-  navigation: IndexScreenNavigationProp;
-}
-
-export const IndexScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-      
+
       <View style={styles.header}>
         <Text style={styles.title}>Gestión de Personal</Text>
         <Text style={styles.subtitle}>Sistema de administración</Text>
@@ -31,11 +25,11 @@ export const IndexScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.welcomeText}>
           Bienvenido al sistema de gestión de personal y departamentos.
         </Text>
-        
+
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.personasButton]}
-            onPress={() => navigation.navigate('ListaPersonas')}
+            onPress={() => router.push('lista-personas' as any)}
           >
             <Text style={styles.buttonIcon}>👥</Text>
             <Text style={styles.buttonText}>Personas</Text>
@@ -44,7 +38,7 @@ export const IndexScreen: React.FC<Props> = ({ navigation }) => {
 
           <TouchableOpacity
             style={[styles.button, styles.departamentosButton]}
-            onPress={() => navigation.navigate('ListaDepartamentos')}
+            onPress={() => router.push('lista-departamentos' as any)}
           >
             <Text style={styles.buttonIcon}>🏢</Text>
             <Text style={styles.buttonText}>Departamentos</Text>
@@ -58,7 +52,7 @@ export const IndexScreen: React.FC<Props> = ({ navigation }) => {
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

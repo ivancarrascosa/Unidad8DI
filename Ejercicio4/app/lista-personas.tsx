@@ -10,18 +10,12 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { usePersonasVM } from '../UI/PersonasVM';
-import { Persona } from '../Domain/entities/Persona';
-import { RootStackParamList } from './_layout';
+import { useRouter } from 'expo-router';
+import { usePersonasVM } from '../src/UI/PersonasVM';
+import { Persona } from '../src/Domain/entities/Persona';
 
-type ListaPersonasNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ListaPersonas'>;
-
-interface Props {
-  navigation: ListaPersonasNavigationProp;
-}
-
-export const ListaPersonasScreen: React.FC<Props> = ({ navigation }) => {
+export default function ListaPersonasScreen() {
+  const router = useRouter();
   const {
     listaPersonas,
     isLoading,
@@ -44,18 +38,18 @@ export const ListaPersonasScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleEdit = (persona: Persona) => {
     seleccionarPersona(persona);
-    navigation.navigate('EditarCrearPersona', { personaId: persona.id });
+    router.push(`editar-crear-persona?personaId=${persona.id}` as any);
   };
 
   const handleCreate = () => {
     seleccionarPersona(null);
-    navigation.navigate('EditarCrearPersona', {});
+    router.push('editar-crear-persona' as any);
   };
 
   const handleDelete = (persona: Persona) => {
     Alert.alert(
       'Confirmar eliminación',
-      `¿Está seguro de eliminar a ${persona.nombre} ${persona.apellido}?`,
+      `¿Está seguro de eliminar a ${persona.nombre || ''} ${persona.apellido || ''}?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -75,14 +69,14 @@ export const ListaPersonasScreen: React.FC<Props> = ({ navigation }) => {
         ) : (
           <View style={[styles.avatar, styles.avatarPlaceholder]}>
             <Text style={styles.avatarText}>
-              {item.nombre.charAt(0)}{item.apellido.charAt(0)}
+              {(item.nombre || '?').charAt(0)}{(item.apellido || '?').charAt(0)}
             </Text>
           </View>
         )}
         <View style={styles.info}>
-          <Text style={styles.name}>{item.nombre} {item.apellido}</Text>
-          <Text style={styles.detail}>📞 {item.telefono}</Text>
-          <Text style={styles.detail}>📍 {item.direccion}</Text>
+          <Text style={styles.name}>{item.nombre || ''} {item.apellido || ''}</Text>
+          <Text style={styles.detail}>📞 {item.telefono || 'N/A'}</Text>
+          <Text style={styles.detail}>📍 {item.direccion || 'N/A'}</Text>
         </View>
       </View>
       <View style={styles.actions}>

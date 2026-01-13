@@ -1,18 +1,11 @@
+import { injectable } from 'inversify';
 import { Departamento } from '../../Domain/entities/Departamento';
 import { IDepartamentoRepository } from '../../Domain/repositories/IDepartamentoRepository';
 import { API_URL, ENDPOINTS } from '../services/APIConnection';
 
+@injectable()
 export class DepartamentoRepository implements IDepartamentoRepository {
-  private static instance: DepartamentoRepository;
-
-  private constructor() {}
-
-  public static getInstance(): DepartamentoRepository {
-    if (!DepartamentoRepository.instance) {
-      DepartamentoRepository.instance = new DepartamentoRepository();
-    }
-    return DepartamentoRepository.instance;
-  }
+  constructor() {}
 
   async crearDepartamento(departamento: Departamento): Promise<Departamento> {
     try {

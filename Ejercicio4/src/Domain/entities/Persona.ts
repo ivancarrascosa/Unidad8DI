@@ -32,11 +32,11 @@ export class Persona{
     return new Persona(
       json.id,
       json.nombre,
-      json.apellidos,          // API usa "Apellidos"
-      json.fechaNacimiento ? new Date(json.fechaNacimiento) : null,  // API usa "FechaNacimiento"
+      json.apellido,           // API usa "apellido"
+      json.fechaNac ? new Date(json.fechaNac) : null,  // API usa "fechaNac"
       json.direccion,
       json.telefono,
-      json.foto,               // API usa "Foto"
+      json.imagen,             // API usa "imagen"
       json.idDepartamento
     );
   }
@@ -45,11 +45,11 @@ export class Persona{
     return {
       id: this.id,
       nombre: this.nombre,
-      apellidos: this.apellido,           // API espera "Apellidos"
-      fechaNacimiento: this.fechaNac,     // API espera "FechaNacimiento"
+      apellido: this.apellido,            // API espera "apellido"
+      fechaNac: this.fechaNac,            // API espera "fechaNac"
       direccion: this.direccion,
       telefono: this.telefono,
-      foto: this.imagen,                  // API espera "Foto"
+      imagen: this.imagen,                // API espera "imagen"
       idDepartamento: this.idDepartamento,
     };
   }

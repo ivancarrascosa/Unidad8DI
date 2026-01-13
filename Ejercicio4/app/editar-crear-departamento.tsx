@@ -11,31 +11,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
-import { useDepartamentosVM } from '../UI/DepartamentosVM';
-import { Departamento } from '../Domain/entities/Departamento';
-import { RootStackParamList } from './_layout';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useDepartamentosVM } from '../src/UI/DepartamentosVM';
+import { Departamento } from '../src/Domain/entities/Departamento';
 
-type EditarCrearDepartamentoNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'EditarCrearDepartamento'
->;
-type EditarCrearDepartamentoRouteProp = RouteProp<
-  RootStackParamList,
-  'EditarCrearDepartamento'
->;
-
-interface Props {
-  navigation: EditarCrearDepartamentoNavigationProp;
-  route: EditarCrearDepartamentoRouteProp;
-}
-
-export const EditarCrearDepartamentoScreen: React.FC<Props> = ({
-  navigation,
-  route,
-}) => {
-  const { departamentoId } = route.params || {};
+export default function EditarCrearDepartamentoScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const departamentoId = params.departamentoId ? Number(params.departamentoId) : undefined;
   const isEditing = departamentoId !== undefined;
 
   const {
@@ -83,7 +66,7 @@ export const EditarCrearDepartamentoScreen: React.FC<Props> = ({
         isEditing
           ? 'Departamento actualizado correctamente'
           : 'Departamento creado correctamente',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => router.back() }]
       );
     }
   };
@@ -122,7 +105,7 @@ export const EditarCrearDepartamentoScreen: React.FC<Props> = ({
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
-              onPress={() => navigation.goBack()}
+              onPress={() => router.back()}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>

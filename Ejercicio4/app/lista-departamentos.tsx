@@ -9,21 +9,12 @@ import {
   Alert,
   SafeAreaView,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useDepartamentosVM } from '../UI/DepartamentosVM';
-import { Departamento } from '../Domain/entities/Departamento';
-import { RootStackParamList } from './_layout';
+import { useRouter } from 'expo-router';
+import { useDepartamentosVM } from '../src/UI/DepartamentosVM';
+import { Departamento } from '../src/Domain/entities/Departamento';
 
-type ListaDepartamentosNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ListaDepartamentos'
->;
-
-interface Props {
-  navigation: ListaDepartamentosNavigationProp;
-}
-
-export const ListaDepartamentosScreen: React.FC<Props> = ({ navigation }) => {
+export default function ListaDepartamentosScreen() {
+  const router = useRouter();
   const {
     listaDepartamentos,
     isLoading,
@@ -46,12 +37,12 @@ export const ListaDepartamentosScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleEdit = (departamento: Departamento) => {
     seleccionarDepartamento(departamento);
-    navigation.navigate('EditarCrearDepartamento', { departamentoId: departamento.id });
+    router.push(`editar-crear-departamento?departamentoId=${departamento.id}` as any);
   };
 
   const handleCreate = () => {
     seleccionarDepartamento(null);
-    navigation.navigate('EditarCrearDepartamento', {});
+    router.push('editar-crear-departamento' as any);
   };
 
   const handleDelete = (departamento: Departamento) => {
