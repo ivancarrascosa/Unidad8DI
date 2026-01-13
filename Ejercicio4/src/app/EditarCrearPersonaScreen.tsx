@@ -1,0 +1,338 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from './navigation';
+import { usePersonasVM } from '../UI/PersonasVM';
+import { Persona } from '../Domain/entities/Persona';
+import { Picker } from '@react-native-picker/picker';
+
+type EditarCrearPersonaNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EditarCrearPersona'
+>;
+type EditarCrearPersonaRouteProp = RouteProp<RootStackParamList, 'EditarCrearPersona'>;
+
+interface Props {
+  navigation: EditarCrearPersonaNavigationProp;
+  route: EditarCrearPersonaRouteProp;
+}
+
+export const EditarCrearPersonaScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { personaId } = route.params || {};
+  const isEditing = personaId !== undefined;
+
+  const {
+    personaSeleccionada,
+    listaDepartamentos,
+    isLoading,
+    error,
+    guardarPersona,
+    cargarDepartamentos,
+    limpiarError,
+  } = usePersonasVM();
+
+  const [formData, setFormData] = useState({
+    nombre: '',
+    apellido: '',
+    fechaNac: '',
+    direccion: '',
+    telefono: '',
+    imagen: '',
+    idDepartamento: 0,
+  });
+
+  useEffect(() => {
+    cargarDepartamentos();
+  }, []);
+
+  useEffect(() => {
+    if (isEditing && personaSeleccionada) {
+      setFormData({
+        nombre: personaSeleccionada.nombre,
+        apellido: personaSeleccionada.apellido,
+        fechaNac: personaSeleccionada.fechaNac 
+          ? personaSeleccionada.fechaNac.toISOString().split('T')[0] 
+          : '',
+        direccion: personaSeleccionada.direccion,
+        telefono: personaSeleccionada.telefono,
+        imagen: personaSeleccionada.imagen,
+        idDepartamento: personaSeleccionada.idDepartamento,
+      });
+    }
+  }, [isEditing, personaSeleccionada]);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error, [{ text: 'OK', onPress: limpiarError }]);
+    }
+  }, [error]);
+
+  const handleChange = (field: string, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const validateForm = (): boolean => {
+    if (!formData.nombre.trim()) {
+      Alert.alert('Validación', 'El nombre es requerido');
+      return false;
+    }
+    if (!formData.apellido.trim()) {
+      Alert.alert('Validación', 'El apellido es requerido');
+      return false;
+    }
+    if (!formData.telefono.trim()) {
+      Alert.alert('Validación', 'El teléfono es requerido');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+
+    const fechaNacDate = formData.fechaNac ? new Date(formData.fechaNac) : null;
+
+    const persona = new Persona(
+      isEditing ? personaId! : 0,
+      formData.nombre,
+      formData.apellido,
+      fechaNacDate,
+      formData.direccion,
+      formData.telefono,
+      formData.imagen,
+      formData.idDepartamento
+    );
+
+    const success = await guardarPersona(persona);
+    if (success) {
+      Alert.alert(
+        'Éxito',
+        isEditing ? 'Persona actualizada correctamente' : 'Persona creada correctamente',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              {isEditing ? 'Editar Persona' : 'Nueva Persona'}
+            </Text>
+          </View>
+
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Nombre *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.nombre}
+                onChangeText={(value) => handleChange('nombre', value)}
+                placeholder="Ingrese el nombre"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Apellido *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.apellido}
+                onChangeText={(value) => handleChange('apellido', value)}
+                placeholder="Ingrese el apellido"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Fecha de Nacimiento</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.fechaNac}
+                onChangeText={(value) => handleChange('fechaNac', value)}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Dirección</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.direccion}
+                onChangeText={(value) => handleChange('direccion', value)}
+                placeholder="Ingrese la dirección"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Teléfono *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.telefono}
+                onChangeText={(value) => handleChange('telefono', value)}
+                placeholder="Ingrese el teléfono"
+                placeholderTextColor="#999"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>URL de Imagen</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.imagen}
+                onChangeText={(value) => handleChange('imagen', value)}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Departamento</Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={formData.idDepartamento}
+                  onValueChange={(value) => handleChange('idDepartamento', value)}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Seleccione un departamento" value={0} />
+                  {listaDepartamentos.map((dept) => (
+                    <Picker.Item
+                      key={dept.id}
+                      label={dept.nombre}
+                      value={dept.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.saveButton]}
+                onPress={handleSave}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Guardar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  header: {
+    padding: 20,
+    backgroundColor: '#4a90d9',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  form: {
+    padding: 20,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    color: '#333',
+  },
+  pickerContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 15,
+    marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  saveButton: {
+    backgroundColor: '#4a90d9',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+});
