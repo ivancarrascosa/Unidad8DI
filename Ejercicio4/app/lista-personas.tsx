@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,10 @@ import {
   Alert,
   Image,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { usePersonasVM } from '../src/UI/PersonasVM';
 import { Persona } from '../src/Domain/entities/Persona';
 
@@ -26,9 +28,11 @@ export default function ListaPersonasScreen() {
     limpiarError,
   } = usePersonasVM();
 
-  useEffect(() => {
-    cargarPersonas();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      cargarPersonas();
+    }, [])
+  );
 
   useEffect(() => {
     if (error) {
@@ -47,18 +51,27 @@ export default function ListaPersonasScreen() {
   };
 
   const handleDelete = (persona: Persona) => {
-    Alert.alert(
-      'Confirmar eliminación',
-      `¿Está seguro de eliminar a ${persona.nombre || ''} ${persona.apellido || ''}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => eliminarPersona(persona.id),
-        },
-      ]
-    );
+    const mensaje = `¿Está seguro de eliminar a ${persona.nombre || ''} ${persona.apellido || ''}?`;
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(mensaje)) {
+        eliminarPersona(persona.id);
+      }
+    } else {
+      // En móvil usamos Alert
+      Alert.alert(
+        'Confirmar eliminación',
+        mensaje,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Eliminar',
+            style: 'destructive',
+            onPress: () => eliminarPersona(persona.id),
+          },
+        ]
+      );
+    }
   };
 
   const renderPersona = ({ item }: { item: Persona }) => (
@@ -108,6 +121,9 @@ export default function ListaPersonasScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/' as any)}>
+          <Text style={styles.backButtonText}>← Volver</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>Lista de Personas</Text>
         <Text style={styles.count}>{listaPersonas.length} registros</Text>
       </View>
@@ -141,6 +157,13 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: '#4a90d9',
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
   },
   title: {
     fontSize: 24,

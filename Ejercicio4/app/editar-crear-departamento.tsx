@@ -61,13 +61,7 @@ export default function EditarCrearDepartamentoScreen() {
 
     const success = await guardarDepartamento(departamento);
     if (success) {
-      Alert.alert(
-        'Éxito',
-        isEditing
-          ? 'Departamento actualizado correctamente'
-          : 'Departamento creado correctamente',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      router.replace('lista-departamentos' as any);
     }
   };
 
@@ -78,6 +72,9 @@ export default function EditarCrearDepartamentoScreen() {
         style={styles.flex}
       >
         <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push('/lista-departamentos' as any)}>
+            <Text style={styles.backButtonText}>← Volver</Text>
+          </TouchableOpacity>
           <Text style={styles.title}>
             {isEditing ? 'Editar Departamento' : 'Nuevo Departamento'}
           </Text>
@@ -105,7 +102,7 @@ export default function EditarCrearDepartamentoScreen() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
-              onPress={() => router.back()}
+              onPress={() => router.push('/lista-departamentos' as any)}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
@@ -139,6 +136,13 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: '#5cb85c',
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
   },
   title: {
     fontSize: 24,

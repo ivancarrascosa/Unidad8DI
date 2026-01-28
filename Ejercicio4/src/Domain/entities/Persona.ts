@@ -42,15 +42,19 @@ export class Persona{
   }
 
   toJson(): object {
-    return {
-      id: this.id,
+    const json: any = {
       nombre: this.nombre,
-      apellido: this.apellido,            // API espera "apellido"
-      fechaNac: this.fechaNac,            // API espera "fechaNac"
+      apellido: this.apellido,
+      fechaNac: this.fechaNac ? this.fechaNac.toISOString() : null,
       direccion: this.direccion,
       telefono: this.telefono,
-      imagen: this.imagen,                // API espera "imagen"
+      imagen: this.imagen,
       idDepartamento: this.idDepartamento,
     };
+    // Solo incluir id si no es 0 (para edición)
+    if (this.id !== 0) {
+      json.id = this.id;
+    }
+    return json;
   }
 }

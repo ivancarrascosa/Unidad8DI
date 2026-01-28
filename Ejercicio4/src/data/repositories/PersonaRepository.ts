@@ -9,69 +9,102 @@ export class PersonaRepository implements IPersonaRepository {
 
   async crearPersona(persona: Persona): Promise<Persona> {
     try {
-      const response = await fetch(API_URL + ENDPOINTS.PERSONAS.CREATE, {
+      const url = API_URL + ENDPOINTS.PERSONAS.CREATE;
+      const body = JSON.stringify(persona.toJson());
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(persona.toJson()),
+        body: body,
       });
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+
+      const responseText = await response.text();
+
+      if (response.status === 204) {
+        throw new Error('No se pudo crear la persona en la base de datos');
       }
-      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status} - ${responseText}`);
+      }
+
+      const data = responseText ? JSON.parse(responseText) : {};
       return Persona.fromJson(data);
     } catch (error) {
-      console.error('Error creando persona:', error);
       throw error;
     }
   }
 
   async editarPersona(id: number, persona: Persona): Promise<Persona> {
     try {
-      const response = await fetch(API_URL + ENDPOINTS.PERSONAS.UPDATE + id, {
+      const url = API_URL + ENDPOINTS.PERSONAS.UPDATE + id;
+      const body = JSON.stringify(persona.toJson());
+
+      const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(persona.toJson()),
+        body: body,
       });
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+
+      const responseText = await response.text();
+
+      if (response.status === 204) {
+        throw new Error('No se pudo actualizar la persona en la base de datos');
       }
-      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status} - ${responseText}`);
+      }
+
+      const data = responseText ? JSON.parse(responseText) : {};
       return Persona.fromJson(data);
     } catch (error) {
-      console.error('Error editando persona:', error);
       throw error;
     }
   }
 
   async eliminarPersona(id: number): Promise<boolean> {
     try {
-      const response = await fetch(API_URL + ENDPOINTS.PERSONAS.DELETE + id, {
+      const url = API_URL + ENDPOINTS.PERSONAS.DELETE + id;
+
+      const response = await fetch(url, {
         method: 'DELETE',
       });
+
+      if (response.status === 204) {
+        throw new Error('No se pudo eliminar la persona de la base de datos');
+      }
+
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+        const responseText = await response.text();
+        throw new Error(`Error HTTP: ${response.status} - ${responseText}`);
       }
       return true;
     } catch (error) {
-      console.error('Error eliminando persona:', error);
       throw error;
     }
   }
 
   async getPersonas(): Promise<Persona[]> {
     try {
-      const response = await fetch(API_URL + ENDPOINTS.PERSONAS.GET_ALL);
+      const url = API_URL + ENDPOINTS.PERSONAS.GET_ALL;
+      const response = await fetch(url);
+
+      if (response.status === 204) {
+        return [];
+      }
+
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
       }
+
       const data: any[] = await response.json();
       return data.map((item: any) => Persona.fromJson(item));
     } catch (error) {
-      console.error('Error obteniendo personas:', error);
       throw error;
     }
   }
@@ -79,13 +112,17 @@ export class PersonaRepository implements IPersonaRepository {
   async getPersonaById(id: number): Promise<Persona> {
     try {
       const response = await fetch(API_URL + ENDPOINTS.PERSONAS.GET_BY_ID + id);
+
+      if (response.status === 204) {
+        throw new Error('Persona no encontrada');
+      }
+
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       return Persona.fromJson(data);
     } catch (error) {
-      console.error('Error obteniendo persona por ID:', error);
       throw error;
     }
   }

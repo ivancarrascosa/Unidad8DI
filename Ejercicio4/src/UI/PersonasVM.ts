@@ -102,11 +102,12 @@ export const usePersonasVM = (): PersonasVMState & PersonasVMActions => {
         await personaUseCase.editarPersona(persona.id, persona);
       }
       await cargarPersonas();
+      updateState({ isLoading: false });
       return true;
     } catch (error: any) {
-      updateState({ 
-        error: error.message || 'Error al guardar persona', 
-        isLoading: false 
+      updateState({
+        error: error.message || 'Error al guardar persona',
+        isLoading: false
       });
       return false;
     }
@@ -115,13 +116,20 @@ export const usePersonasVM = (): PersonasVMState & PersonasVMActions => {
   const eliminarPersona = useCallback(async (id: number): Promise<boolean> => {
     updateState({ isLoading: true, error: null });
     try {
-      await personaUseCase.eliminarPersona(id);
+      const resultado = await personaUseCase.eliminarPersona(id);
+      if (!resultado) {
+        updateState({
+          error: 'No se pudo eliminar la persona',
+          isLoading: false
+        });
+        return false;
+      }
       await cargarPersonas();
       return true;
     } catch (error: any) {
-      updateState({ 
-        error: error.message || 'Error al eliminar persona', 
-        isLoading: false 
+      updateState({
+        error: error.message || 'Error al eliminar persona',
+        isLoading: false
       });
       return false;
     }

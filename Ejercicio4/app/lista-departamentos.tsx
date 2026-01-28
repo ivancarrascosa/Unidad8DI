@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useDepartamentosVM } from '../src/UI/DepartamentosVM';
 import { Departamento } from '../src/Domain/entities/Departamento';
 
@@ -25,9 +27,11 @@ export default function ListaDepartamentosScreen() {
     limpiarError,
   } = useDepartamentosVM();
 
-  useEffect(() => {
-    cargarDepartamentos();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      cargarDepartamentos();
+    }, [])
+  );
 
   useEffect(() => {
     if (error) {
@@ -46,18 +50,26 @@ export default function ListaDepartamentosScreen() {
   };
 
   const handleDelete = (departamento: Departamento) => {
-    Alert.alert(
-      'Confirmar eliminación',
-      `¿Está seguro de eliminar el departamento "${departamento.nombre}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => eliminarDepartamento(departamento.id),
-        },
-      ]
-    );
+    const mensaje = `¿Está seguro de eliminar el departamento "${departamento.nombre}"?`;
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(mensaje)) {
+        eliminarDepartamento(departamento.id);
+      }
+    } else {
+      Alert.alert(
+        'Confirmar eliminación',
+        mensaje,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Eliminar',
+            style: 'destructive',
+            onPress: () => eliminarDepartamento(departamento.id),
+          },
+        ]
+      );
+    }
   };
 
   const renderDepartamento = ({ item }: { item: Departamento }) => (
@@ -100,6 +112,9 @@ export default function ListaDepartamentosScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/' as any)}>
+          <Text style={styles.backButtonText}>← Volver</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>Lista de Departamentos</Text>
         <Text style={styles.count}>{listaDepartamentos.length} registros</Text>
       </View>
@@ -133,6 +148,13 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: '#5cb85c',
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
   },
   title: {
     fontSize: 24,
